@@ -10,11 +10,13 @@ source("/Users/javi/Desktop/R-workspace/NAC_DEA/Code/0_loadlibraries.R")
 orgdb = "org.Hs.eg.db"
 biomart_dataset = "hsapiens_gene_ensembl"
 keggname = "hsa"
+reactomename = "human"
 loadpkg("dplyr")
 loadpkg("clusterProfiler")
 loadpkg("org.Hs.eg.db")
 loadpkg("biomaRt")
 loadpkg("pathview")
+loadpkg("ReactomePA")
 loadpkg("DOSE")
 
 
@@ -48,6 +50,7 @@ enrich_cp = function(res, comparison, type="over") {
         cc = enrichGO(genes, OrgDb = orgdb, ont = "CC", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
         bp = enrichGO(genes, OrgDb = orgdb, ont = "BP", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
         kg = enrichKEGG(gene = genes, organism = keggname, pvalueCutoff = 1, qvalueCutoff = 1, pAdjustMethod = "BH")
+        re = enrichPathway(gene=genes, organism = reactomename, pvalueCutoff=1, qvalueCutoff = 1, pAdjustMethod = "BH")
         # mf = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "MF", pAdjustMethod = "BH", 
         # qvalueCutoff = 1, pvalueCutoff = 1)
         # cc = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "CC", pAdjustMethod = "BH", 
@@ -68,6 +71,7 @@ enrich_cp = function(res, comparison, type="over") {
         cc = enrichGO(genes, OrgDb = orgdb, ont = "CC", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
         bp = enrichGO(genes, OrgDb = orgdb, ont = "BP", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
         kg = enrichKEGG(gene = genes, organism = keggname, pvalueCutoff = 1, qvalueCutoff = 1, pAdjustMethod = "BH")
+        re = enrichPathway(gene=genes, organism = reactomename, pvalueCutoff=1, qvalueCutoff = 1, pAdjustMethod = "BH")
         # mf = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "MF", pAdjustMethod = "BH", 
         # qvalueCutoff = 1, pvalueCutoff = 1)
         # cc = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "CC", pAdjustMethod = "BH", 
@@ -88,6 +92,7 @@ enrich_cp = function(res, comparison, type="over") {
         cc = enrichGO(genes, OrgDb = orgdb, ont = "CC", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
         bp = enrichGO(genes, OrgDb = orgdb, ont = "BP", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
         kg = enrichKEGG(gene = genes, organism = keggname, pvalueCutoff = 1, qvalueCutoff = 1, pAdjustMethod = "BH")
+        re = enrichPathway(gene=genes, organism = reactomename, pvalueCutoff=1, qvalueCutoff = 1, pAdjustMethod = "BH")
         # mf = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "MF", pAdjustMethod = "BH", 
         # qvalueCutoff = 1, pvalueCutoff = 1)
         # cc = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "CC", pAdjustMethod = "BH", 
@@ -120,6 +125,7 @@ gsea_cp = function(res, comparison) {
     # genes = genes[order(genes, decreasing=TRUE)] genes = genes[!is.na(genes)]
     kg = gseKEGG(geneList = genes, organism = keggname, nPerm = 500, pvalueCutoff = 1, 
         verbose = TRUE)
+    re = gsePathway(gene=genes, organism = reactomename, pvalueCutoff=1, qvalueCutoff = 1, pAdjustMethod = "BH")
     if (orgdb == "org.Hs.eg.db") {
         do = DOSE::gseDO(geneList = genes, nPerm = 500, pvalueCutoff = 1, pAdjustMethod = "BH", 
             verbose = TRUE)
