@@ -59,7 +59,7 @@ enrich_cp = function(res, comparison, type="over") {
         # qvalueCutoff = 1, pvalueCutoff = 1)
         # kg = enrichKEGG(gene = genes, universe = universe, organism = keggname, pvalueCutoff = 1, 
         # qvalueCutoff = 1, pAdjustMethod = "BH")
-        all = list(mf = mf, cc = cc, bp = bp, kg = kg)
+        all = list(mf = mf, cc = cc, bp = bp, kg = kg, re = re)
         all[["summary"]] = summarize_cp(all, comparison)
         return(all)
     }
@@ -80,7 +80,7 @@ enrich_cp = function(res, comparison, type="over") {
         # qvalueCutoff = 1, pvalueCutoff = 1)
         # kg = enrichKEGG(gene = genes, universe = universe, organism = keggname, pvalueCutoff = 1, 
         # qvalueCutoff = 1, pAdjustMethod = "BH")
-        all = list(mf = mf, cc = cc, bp = bp, kg = kg)
+        all = list(mf = mf, cc = cc, bp = bp, kg = kg, re = re)
         all[["summary"]] = summarize_cp(all, comparison)
         return(all)
     }
@@ -101,7 +101,7 @@ enrich_cp = function(res, comparison, type="over") {
         # qvalueCutoff = 1, pvalueCutoff = 1)
         # kg = enrichKEGG(gene = genes, universe = universe, organism = keggname, pvalueCutoff = 1, 
         # qvalueCutoff = 1, pAdjustMethod = "BH")
-        all = list(mf = mf, cc = cc, bp = bp, kg = kg)
+        all = list(mf = mf, cc = cc, bp = bp, kg = kg, re = re)
         all[["summary"]] = summarize_cp(all, comparison)
         return(all)
     }
@@ -125,13 +125,13 @@ gsea_cp = function(res, comparison) {
     # genes = genes[order(genes, decreasing=TRUE)] genes = genes[!is.na(genes)]
     kg = gseKEGG(geneList = genes, organism = keggname, nPerm = 500, pvalueCutoff = 1, 
         verbose = TRUE)
-    re = gsePathway(gene=genes, organism = reactomename, pvalueCutoff=1, qvalueCutoff = 1, pAdjustMethod = "BH")
+    re = gsePathway(gene=genes, organism = reactomename, pvalueCutoff=1, pAdjustMethod = "BH")
     if (orgdb == "org.Hs.eg.db") {
         do = DOSE::gseDO(geneList = genes, nPerm = 500, pvalueCutoff = 1, pAdjustMethod = "BH", 
             verbose = TRUE)
-        all = list(mf = mf, cc = cc, bp = bp, kg = kg, do = do)
+        all = list(mf = mf, cc = cc, bp = bp, kg = kg, do = do, re = re)
     } else {
-        all = list(mf = mf, cc = cc, bp = bp, kg = kg)
+        all = list(mf = mf, cc = cc, bp = bp, kg = kg, re = re)
     }
     all[["summary"]] = summarize_cp(all, comparison)
     return(all)
