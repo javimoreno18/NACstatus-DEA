@@ -25,7 +25,7 @@ The protocol is base on the execution of three R scripts that perform the follow
 set.seed(12345)
 
 # set working directory
-workingDir <- "/Users/javi/Desktop/R-workspace/NAC_DEA"
+workingDir <- "."
 setwd(workingDir)
 
 options(stringsAsFactors = FALSE)
@@ -37,6 +37,7 @@ source("Code/coreDEA_2.R")
 source("Code/coreDEA_3.R")
 source("Code/coreDEA_4.R")
 loadpkg("rgl")
+loadpkg("calibrate") # To label the volcano plot
 ```  
 
 ### Execution
@@ -338,7 +339,6 @@ View(dea.p)
 We see the `r nrow(dea.p)` genes sorted by log2FC with significantly altered expression associated with NAC status. We can show the results of the differential expression analysis as a volcano plot. A volcano plot typically plots some measure of effect on the x-axis (typically the fold change) and the statistical significance on the y-axis (typically the -log10 of the p-value). Genes that are highly dysregulated are farther to the left and right sides, while highly significant changes appear higher on the plot.
 
 ```{r message=FALSE, warning=FALSE}
-loadpkg("calibrate") # To label the volcano plot
 tab = data.frame(logFC = dea.o$log2FoldChange, negLogPval = -log10(dea.o$padj))
 tab2 = data.frame(logFC = dea.o$log2FoldChange, negLogPval = -log10(dea.o$padj), Gene=dea.o$gene.name)
 lfc = 1
@@ -380,11 +380,11 @@ res$refseq_mrna = converted
 lost.genes = length(res$rowname) - length((res %>% data.frame() %>% left_join(entrez, by = "refseq_mrna") %>% 
         filter(!is.na(entrezgene)) %>% filter(!is.na(log2FoldChange)) %>% filter(!is.na(lfcSE)))$rowname)
 
-gsea_rs = gsea_cp(res, "NACstatus")
+#gsea_rs = gsea_cp(res, "NACstatus")
 
-gsea_summary = gsea_rs$summary %>% arrange(pvalue)
-gsea_summary = convert_gsea_results(gsea_summary)
-write_csv(x = gsea_summary, path = "Results/NACstatus_gsea.csv")
+#gsea_summary = gsea_rs$summary %>% arrange(pvalue)
+#gsea_summary = convert_gsea_results(gsea_summary)
+#write_csv(x = gsea_summary, path = "Results/NACstatus_gsea.csv")
 ```
 
 We need to first pull out the Refseq IDs from the Nanostring IDs and convert those to Entrez IDs. Not all of the genes have Entrez IDs, however, we lose `r lost.genes` genes through this conversion. Genes are sorted by signal to noise ratio, which are defined as the log2Fold change (the signal) divided by the log2Fold change standard error (the noise).
@@ -393,28 +393,37 @@ I sorted the ontology/KEGG pathway terms by p-value and output a table of the re
 
 We perform a classic enrichment analysis in GO, Reactome and KEGG for all the genes differentially epressed by NAC.
 
-```{r echo=FALSE, echo=FALSE,message=F, warning=F}
+```{r eval=FALSE, message=F, warning=F, include=FALSE, echo=TRUE}
 enrich_rs = enrich_cp(res, "NAC", type="all")
 enrich_summary = enrich_rs$summary %>% arrange(p.adjust)
 enrich_summary = convert_enriched_ids(enrich_summary,entrezsymbol = entrezsymbol) %>% arrange(p.adjust)
 write_csv(x = enrich_summary,path = "Results/NACstatus_enrichment.csv" )
+save(enrich_rs, file = 'Data/RData/enrich_rs.RData')
 ```
 
 
 We perform also a classic enrichment analysis for GO, Reactome and KEGG using the genes substantially over-expressed and under-expressed. We will use a two-fold fold-change cutoff.
-```{r, echo=FALSE,message=F, warning=F}
+```{r,eval=FALSE ,echo=TRUE,message=F, warning=F}
 enrichover_rs = enrich_cp(res, "NAC", type="over")
 enrichover_summary = enrichover_rs$summary %>% arrange(p.adjust)
 enrichover_summary = convert_enriched_ids(enrichover_summary,entrezsymbol = entrezsymbol) %>% arrange(p.adjust)
 write_csv(x = enrichover_summary,path = "Results/NACstatus_over_enrichment.csv" )
+save(enrichover_rs, file = 'Data/RData/enrichover_rs.RData')
 
 enrichunder_rs = enrich_cp(res, "NAC", type="under")
 enrichunder_summary = enrichunder_rs$summary %>% arrange(p.adjust)
 enrichunder_summary = convert_enriched_ids(enrichunder_summary,entrezsymbol = entrezsymbol) %>% arrange(p.adjust)
 write_csv(x = enrichunder_summary,path = "Results/NACstatus_under_enrichment.csv" )
+save(enrichunder_rs, file = 'Data/RData/enrichunder_rs.RData')
 ```
 
-Finally we can see the GO BP, Reactome and KEGG pathways enriched.
+Finally we can see the GO BP, Reactome and KEGG pathways enriched.  
+
+```{r}
+load('Data/RData/enrich_rs.RData')
+load('Data/RData/enrichover_rs.RData')
+load('Data/RData/enrichunder_rs.RData')
+```
 
 GO BP Enrichment in all the significantly expressed genes:
 ```{r,echo=FALSE}
